@@ -1,0 +1,91 @@
+---
+title: "Kong Air API Frequently Asked Questions (FAQ)"
+sidebarTitle: "FAQ"
+description: "Answers to common questions from developers integrating with the Kong Air API, covering authentication, rate limits, data formats, and more."
+---
+
+This page answers common questions from developers building on the Kong Air API platform. If your question isn't answered here, contact the Kong Air platform team.
+
+## Authentication
+
+<AccordionGroup>
+  <Accordion title="How do I get an API key?">
+    Contact the Kong Air platform team to request API credentials. Provide your application name and the endpoints you need access to. You'll receive an API key that you pass in the `X-API-Key` header.
+  </Accordion>
+
+  <Accordion title="Can I use both API keys and JWTs?">
+    Yes. Kong Air supports both authentication methods on all endpoints. Use whichever fits your integration architecture — API keys for server-to-server calls, JWTs for user-context flows.
+  </Accordion>
+
+  <Accordion title="Do API keys expire?">
+    Contact the Kong Air platform team for information about your key's expiry policy. If your key stops working unexpectedly, it may have been rotated — reach out to get a new one.
+  </Accordion>
+</AccordionGroup>
+
+## Flights and Routes
+
+<AccordionGroup>
+  <Accordion title="What date format does the flights endpoint accept?">
+    The `date` query parameter uses ISO 8601 date format: `YYYY-MM-DD`. For example: `?date=2024-03-20`.
+  </Accordion>
+
+  <Accordion title="What timezone are departure and arrival times in?">
+    All timestamps in the API are in UTC (Coordinated Universal Time), formatted as ISO 8601 datetime strings ending in `Z` (e.g., `2024-03-20T09:12:28Z`). Convert to the user's local timezone in your application layer.
+  </Accordion>
+
+  <Accordion title="What does the avg_duration field on a Route represent?">
+    `avg_duration` is the historical average flight duration in **minutes** for that route. It's a planning estimate and does not reflect the actual scheduled time for a specific flight. Use the flight's `scheduled_departure` and `scheduled_arrival` for precise durations.
+  </Accordion>
+
+  <Accordion title="How do I find all flights between two specific airports?">
+    First, look up the route ID using `GET /routes?origin=LHR` to find routes departing from your origin. Then, filter the `GET /flights` results by matching the `route_id` field against the route's `id`. For example, to find all LHR → SFO flights, filter for `route_id: "LHR-SFO"`.
+  </Accordion>
+</AccordionGroup>
+
+## Bookings
+
+<AccordionGroup>
+  <Accordion title="Is the seat field required when creating a booking?">
+    The `seat` field is optional. If you omit it from the request body, a seat will be assigned automatically.
+  </Accordion>
+
+  <Accordion title="Can I cancel or modify an existing booking?">
+    Booking cancellation and modification are not available through the current public API. Contact the Kong Air platform team for information about managing existing reservations.
+  </Accordion>
+
+  <Accordion title="Why did my POST /bookings return 404?">
+    The most common cause is an invalid `flight_number`. The flight number must match an active, scheduled flight. Verify the flight exists by calling `GET /flights/{flightNumber}` before submitting a booking.
+  </Accordion>
+</AccordionGroup>
+
+## Customer Data
+
+<AccordionGroup>
+  <Accordion title="How does the API know which customer's data to return?">
+    The Kong Air API resolves your authenticated identity to a customer record automatically. You don't pass a customer ID — your API key or JWT is mapped to your account behind the scenes.
+  </Accordion>
+
+  <Accordion title="Can I update customer profile data through the API?">
+    Customer profile data is read-only through the public API. Reach out to the Kong Air platform team for information about profile management workflows.
+  </Accordion>
+
+  <Accordion title="Why are card numbers redacted in payment method responses?">
+    Kong Air never exposes full payment card numbers through the API for PCI compliance. The `redacted_card_number` field always shows only the last four digits. This is by design.
+  </Accordion>
+</AccordionGroup>
+
+## General
+
+<AccordionGroup>
+  <Accordion title="What is the base URL for all API requests?">
+    All Kong Air API endpoints share a single base URL: `https://api.kong-air.com`. There is no versioning prefix in the path.
+  </Accordion>
+
+  <Accordion title="Are there rate limits on the API?">
+    Rate limits may apply depending on your access tier. Contact the Kong Air platform team to understand the limits for your API key.
+  </Accordion>
+
+  <Accordion title="Is there a sandbox or test environment?">
+    Contact the Kong Air platform team to inquire about sandbox access for development and testing.
+  </Accordion>
+</AccordionGroup>

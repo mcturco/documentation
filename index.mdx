@@ -1,0 +1,58 @@
+---
+title: "Kong Air Developer Portal | Flights, Bookings & More"
+sidebarTitle: "Home"
+description: "Build flight search, booking, and customer management applications on top of Kong Air's REST APIs. Everything you need to get started is here."
+---
+
+Kong Air provides a suite of REST APIs that let you search scheduled flights, look up routes, create and manage bookings, and access customer profile data — all through a single base URL. Whether you're building a travel app, an airline integration, or a third-party service, this portal has everything you need to authenticate, explore, and call the Kong Air APIs.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Make your first API call in under five minutes
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn how to authenticate every request with API keys or JWTs
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/flights/get-flights">
+    Full reference for Flights, Routes, Bookings, and Customer endpoints
+  </Card>
+  <Card title="Guides" icon="book-open" href="/guides/search-flights">
+    Step-by-step walkthroughs for common integration tasks
+  </Card>
+</CardGroup>
+
+## The Kong Air APIs
+
+Kong Air exposes four primary service APIs, all available under `https://api.kong-air.com`.
+
+<CardGroup cols={2}>
+  <Card title="Flights" icon="plane" href="/api/flights/get-flights">
+    Query scheduled flights by date and retrieve detailed flight information
+  </Card>
+  <Card title="Routes" icon="route" href="/api/routes/get-routes">
+    Discover all origin and destination airport pairings Kong Air flies
+  </Card>
+  <Card title="Bookings" icon="ticket" href="/api/bookings/get-bookings">
+    Create new bookings and retrieve a customer's existing reservations
+  </Card>
+  <Card title="Customer" icon="user" href="/api/customer/get-customer">
+    Access customer profile data including contact info and frequent flyer details
+  </Card>
+</CardGroup>
+
+## Get Up and Running
+
+<Steps>
+  <Step title="Request API access">
+    Sign up for a Kong Air developer account to obtain your API key or JWT credentials.
+  </Step>
+  <Step title="Authenticate your requests">
+    Pass your API key in the `X-API-Key` header, or use a Bearer JWT in the `Authorization` header on every request.
+  </Step>
+  <Step title="Explore the APIs">
+    Use the [Quickstart](/quickstart) guide to make your first call, then explore the [API Reference](/api/flights/get-flights) for the full surface area.
+  </Step>
+  <Step title="Build your integration">
+    Follow the [Guides](/guides/search-flights) for end-to-end walkthroughs of the most common use cases.
+  </Step>
+</Steps>

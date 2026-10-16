@@ -1,0 +1,73 @@
+---
+title: "POST /bookings — Create a New Kong Air Flight Booking"
+sidebarTitle: "POST /bookings"
+description: "POST /bookings — Creates a new Kong Air flight booking for the authenticated customer. Requires a valid flight number and returns a ticket number on success."
+---
+
+Creates a new flight booking for the authenticated customer. Provide a valid flight number and an optional seat preference. On success, the API returns a unique ticket number that serves as the booking reference.
+
+**Endpoint**
+
+```javascript expandable
+POST https://api.kong-air.com/bookings
+```
+
+## Request
+
+### Headers
+
+<ParamField header="X-API-Key" type="string">
+  Your Kong Air API key. Required if not using Bearer authentication.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Bearer JWT token. Required if not using API key authentication. Format: `Bearer <token>`
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`
+</ParamField>
+
+### Request body
+
+<ParamField body="flight_number" type="string" required>
+  The flight number to book. Example: `KA924`
+</ParamField>
+
+<ParamField body="seat" type="string">
+  Preferred seat number. Example: `32A`. Optional — a seat is assigned automatically if omitted.
+</ParamField>
+
+## Response
+
+Returns `201 Created` with a booking confirmation object.
+
+<ResponseField name="ticket_number" type="string" required>
+  The unique ticket number for the new booking. Store this as your booking reference. Example: `CDF3412`
+</ResponseField>
+
+## Example
+
+```bash
+curl -s -X POST \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"flight_number": "KA924", "seat": "32A"}' \
+  https://api.kong-air.com/bookings
+```
+
+**201 Created Response**
+
+```json
+{
+  "ticket_number": "CDF3412"
+}
+```
+
+## Error codes
+
+| Code | Description |
+| --- | --- |
+| `401 Unauthorized` | Missing or invalid authentication credentials |
+| `404 Not Found` | The specified `flight_number` does not exist |
+| `500 Internal Server Error` | Service is temporarily unavailable |

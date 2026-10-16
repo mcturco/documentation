@@ -1,0 +1,120 @@
+---
+title: "GET /customer — Fetch the Authenticated Customer Profile"
+sidebarTitle: "GET /customer"
+description: "GET /customer — Returns the full profile for the authenticated Kong Air customer, including contact info, frequent flyer number, and redacted payment methods."
+---
+
+Returns the full customer profile for the currently authenticated traveler. The response includes contact information, the frequent flyer program number, and a list of saved payment methods with redacted card numbers.
+
+**Endpoint**
+
+```
+GET https://api.kong-air.com/customer
+```
+
+## Request
+
+### Headers
+
+<ParamField header="X-API-Key" type="string">
+  Your Kong Air API key. Required if not using Bearer authentication.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Bearer JWT token. Required if not using API key authentication. Format: `Bearer <token>`
+</ParamField>
+
+## Response
+
+Returns a Customer object.
+
+<ResponseField name="id" type="string">
+  Unique customer identifier
+</ResponseField>
+
+<ResponseField name="username" type="string">
+  The customer's username
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Customer full display name
+</ResponseField>
+
+<ResponseField name="information" type="object">
+  Nested object containing contact details and account information
+  <Expandable title="information properties">
+    <ResponseField name="address" type="string">
+      Mailing address
+    </ResponseField>
+    <ResponseField name="phone_number" type="string">
+      Contact phone number
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      Email address
+    </ResponseField>
+    <ResponseField name="frequent_flier_number" type="string">
+      Kong Air frequent flyer program number
+    </ResponseField>
+    <ResponseField name="payment_methods" type="array">
+      List of saved payment methods
+      <Expandable title="payment method properties">
+        <ResponseField name="id" type="string">
+          Unique payment method identifier
+        </ResponseField>
+        <ResponseField name="redacted_card_number" type="string">
+          Masked card number showing only the last four digits
+        </ResponseField>
+        <ResponseField name="card_holder_name" type="string">
+          Name on the card
+        </ResponseField>
+        <ResponseField name="expiration-date" type="string">
+          Card expiry date
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/customer
+```
+
+**200 OK Response**
+
+```json
+{
+  "id": "cust_001",
+  "username": "alice",
+  "name": "Alice Johnson",
+  "information": {
+    "address": "123 Heathrow Road, London, UK",
+    "phone_number": "+44 20 7946 0958",
+    "email": "alice@example.com",
+    "frequent_flier_number": "KA-FF-445521",
+    "payment_methods": [
+      {
+        "id": "pm_001",
+        "redacted_card_number": "**** **** **** 4242",
+        "card_holder_name": "Alice Johnson",
+        "expiration-date": "12/26"
+      }
+    ]
+  }
+}
+```
+
+## Error codes
+
+| Code | Description |
+|------|-------------|
+| `401 Unauthorized` | Missing or invalid authentication credentials |
+| `404 Not Found` | No customer record exists for the authenticated identity |
+| `500 Internal Server Error` | Service is temporarily unavailable |
+
+<Note>
+  Card numbers are always returned in redacted form. Full card numbers are never exposed through the API.
+</Note>

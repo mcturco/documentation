@@ -1,0 +1,59 @@
+---
+title: "Customer Profiles: Identity and Data in Kong Air API"
+sidebarTitle: "Customers"
+description: "Learn how Kong Air models customer identity, what profile data is available through the Customer API, and how authentication maps to a customer record."
+---
+
+The Customer service provides access to a traveler's profile data, including contact information, frequent flyer details, and saved payment methods. Customer identity is resolved automatically from your authentication credentials — you never need to pass a customer ID in the URL.
+
+## The Customer object
+
+A Customer record contains the core identity and account data for a Kong Air traveler.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique identifier for the customer |
+| `username` | string | The customer's username, used as the identity key across services |
+| `name` | string | Full display name |
+| `information` | object | Nested object with contact and account details |
+
+### CustomerInformation fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address` | string | Mailing address |
+| `phone_number` | string | Contact phone number |
+| `email` | string | Email address |
+| `frequent_flier_number` | string | Kong Air frequent flyer program number |
+| `payment_methods` | array | List of saved payment methods |
+
+### PaymentMethod fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique payment method ID |
+| `redacted_card_number` | string | Masked card number, e.g. `**** **** **** 4242` |
+| `card_holder_name` | string | Name on the card |
+| `expiration-date` | string | Card expiry |
+
+## How customer identity works
+
+The Customer API does not take a customer ID as a path or query parameter. A single authenticated request always returns the profile for the caller — your API key or Bearer token determines which customer record is returned.
+
+```bash
+curl -s \
+  -H "X-API-Key: your-api-key" \
+  https://api.kong-air.com/customer
+```
+
+This means the response is always scoped to the authenticated customer, making the endpoint safe and simple to call without any additional parameters.
+
+## Payment method privacy
+
+Payment method card numbers are always returned in redacted form. Full card numbers are never exposed through the API.
+
+<Note>
+  Customer data is read-only through the public API. Profile updates are not supported via the API at this time.
+</Note>
+
+See the [Manage Customer guide](/guides/manage-customer) for practical examples of retrieving and displaying customer data.

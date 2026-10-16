@@ -1,0 +1,133 @@
+---
+title: "Search and Browse Kong Air Flights and Routes"
+sidebarTitle: "Search Flights"
+description: "Learn how to search Kong Air scheduled flights by date, look up available routes, and fetch detailed flight information using the Flights and Routes APIs."
+---
+
+This guide walks you through building a complete flight search experience using the Kong Air Flights and Routes APIs. You'll learn how to list available routes, query flights by date, and fetch rich details for a specific flight.
+
+## Prerequisites
+
+- A valid Kong Air API key (see [Authentication](/authentication))
+- `curl` or an HTTP client
+
+## Step 1 — Discover available routes
+
+Before searching for flights, fetch all routes Kong Air currently operates. This gives you the list of valid origin/destination airport pairings:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/routes
+```
+
+```json
+[
+  {
+    "id": "LHR-SFO",
+    "origin": "LHR",
+    "destination": "SFO",
+    "avg_duration": 660
+  }
+]
+```
+
+To filter routes by a specific departure airport, use the `origin` query parameter:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  "https://api.kong-air.com/routes?origin=LHR"
+```
+
+## Step 2 — Search flights by date
+
+Call `GET /flights` with a `date` query parameter to find all scheduled flights for a specific day. The date must be in `YYYY-MM-DD` format:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  "https://api.kong-air.com/flights?date=2024-03-20"
+```
+
+```json
+[
+  {
+    "number": "KD924",
+    "route_id": "LHR-SFO",
+    "scheduled_departure": "2024-03-20T09:12:28Z",
+    "scheduled_arrival": "2024-03-20T19:12:28Z"
+  },
+  {
+    "number": "KD925",
+    "route_id": "SFO-LHR",
+    "scheduled_departure": "2024-03-21T09:12:28Z",
+    "scheduled_arrival": "2024-03-21T19:12:28Z"
+  }
+]
+```
+
+Omitting the `date` parameter returns flights for the current day.
+
+## Step 3 — Match flights to routes
+
+Each flight object includes a `route_id` field that matches the `id` in the Routes response. Join them client-side to display full origin/destination labels alongside departure times:
+
+```javascript flight-search.js
+const routes = await fetchRoutes();     // GET /routes
+const flights = await fetchFlights(date); // GET /flights?date=...
+
+const enriched = flights.map(flight => ({
+  ...flight,
+  route: routes.find(r => r.id === flight.route_id)
+}));
+```
+
+## Step 4 — Fetch flight details
+
+When a user selects a specific flight, retrieve enriched details to display aircraft type, meal choices, and entertainment availability:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/flights/KD924/details
+```
+
+```json
+{
+  "flight_number": "KD924",
+  "in_flight_entertainment": true,
+  "meal_options": ["Standard", "Vegetarian", "Vegan"],
+  "aircraft_type": "Boeing 787"
+}
+```
+
+## Complete example
+
+Here's a complete shell script that searches routes, queries flights for a date, and prints enriched results:
+
+```bash search-flights.sh
+#!/bin/bash
+API_KEY="$KONG_AIR_API_KEY"
+BASE="https://api.kong-air.com"
+DATE="2024-03-20"
+
+# Get all routes
+ROUTES=$(curl -s -H "X-API-Key: $API_KEY" "$BASE/routes")
+
+# Get flights for the date
+FLIGHTS=$(curl -s -H "X-API-Key: $API_KEY" "$BASE/flights?date=$DATE")
+
+echo "Flights on $DATE:"
+echo "$FLIGHTS" | jq '.[] | {number, route: .route_id, departs: .scheduled_departure}'
+```
+
+<Note>
+  All timestamps are returned in UTC. Convert to the user's local timezone before displaying departure times in your application.
+</Note>
+
+## Next steps
+
+- [Create a Booking](/guides/create-booking) — book one of the flights you found
+- [GET /flights reference](/api/flights/get-flights) — full parameter and response documentation
+- [GET /routes reference](/api/routes/get-routes) — full routes endpoint documentation

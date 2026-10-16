@@ -1,0 +1,70 @@
+---
+title: "Bookings: How Flight Reservations Work in Kong Air"
+sidebarTitle: "Bookings"
+description: "Understand the Kong Air booking data model — how reservations are created, what a Booking object contains, and how customer identity links bookings to travelers."
+---
+
+The Bookings service manages flight reservations for Kong Air customers. When a customer selects a flight and seat, your integration creates a Booking through the API and receives a ticket number confirming the reservation.
+
+## The Booking object
+
+A Booking represents a confirmed reservation for a specific customer on a specific flight.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ticket_number` | string | Unique ticket identifier issued at booking time, e.g. `CDF3412` |
+| `seat` | string | Assigned seat number, e.g. `32A` |
+| `flight` | object | Embedded flight details (number, route, departure, arrival) |
+
+```json
+{
+  "ticket_number": "CDF3412",
+  "seat": "32A",
+  "flight": {
+    "number": "KA924",
+    "route_id": "LHR-SFO",
+    "scheduled_departure": "2023-09-03T09:15:00Z",
+    "scheduled_arrival": "2023-09-03T14:23:00Z"
+  }
+}
+```
+
+## Creating a booking
+
+To create a booking, `POST` to `/bookings` with a `flight_number` and `seat`. The `flight_number` must match a valid, scheduled flight from the Flights service.
+
+```bash
+curl -s -X POST https://api.kong-air.com/bookings \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "flight_number": "KA924",
+    "seat": "32A"
+  }'
+```
+
+A successful response returns `201 Created` with the new ticket number:
+
+```json
+{
+  "ticket_number": "CDF3412"
+}
+```
+
+## Customer identity and bookings
+
+Bookings are automatically scoped to the authenticated customer. Your API key or Bearer token identifies who you are — you do not need to pass a customer ID in the request body. The service associates the new booking with your account based on your authentication credentials.
+
+<Note>
+  The `flight_number` in a booking request must exist in the Flights service. Passing an unknown flight number returns `404 Not Found`.
+</Note>
+
+## Booking lifecycle
+
+1. **Search** — Use `GET /flights` to find available flights
+2. **Select** — Choose a flight number and preferred seat
+3. **Create** — `POST /bookings` with the flight number and seat
+4. **Confirm** — Store the returned `ticket_number` as your booking reference
+5. **Retrieve** — Call `GET /bookings` at any time to list all bookings for the authenticated customer
+
+See the [Create a Booking guide](/guides/create-booking) for a full code walkthrough.

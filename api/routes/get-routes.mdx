@@ -1,0 +1,89 @@
+---
+title: "GET /routes — List All Kong Air Flight Routes"
+sidebarTitle: "GET /routes"
+description: "GET /routes — Returns all origin/destination route pairs that Kong Air operates. Filter by one or more origin airport IATA codes to narrow results."
+---
+
+Returns all routes that Kong Air is currently registered to fly. A route is an origin/destination airport pairing — use this endpoint to discover available destinations or build a flight search form with airport dropdowns.
+
+**Endpoint**
+
+```
+GET https://api.kong-air.com/routes
+```
+
+## Request
+
+### Headers
+
+<ParamField header="X-API-Key" type="string">
+  Your Kong Air API key. Required if not using Bearer authentication.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Bearer JWT token. Required if not using API key authentication. Format: `Bearer <token>`
+</ParamField>
+
+### Query parameters
+
+<ParamField query="origin" type="array of strings">
+  Filter routes by one or more departure airport IATA codes. For example: `?origin=LHR` or `?origin=LHR&origin=SFO`
+</ParamField>
+
+## Response
+
+Returns a JSON array of Route objects.
+
+<ResponseField name="id" type="string" required>
+  Unique route identifier in `ORIGIN-DEST` format, e.g. `LHR-SFO`
+</ResponseField>
+
+<ResponseField name="origin" type="string" required>
+  3-letter IATA code for the departure airport
+</ResponseField>
+
+<ResponseField name="destination" type="string" required>
+  3-letter IATA code for the arrival airport
+</ResponseField>
+
+<ResponseField name="avg_duration" type="integer" required>
+  Average flight duration for this route in minutes
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+
+```bash All routes
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/routes
+```
+
+```bash Filter by origin
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  "https://api.kong-air.com/routes?origin=LHR"
+```
+
+</CodeGroup>
+
+**200 OK Response**
+
+```json
+[
+  {
+    "id": "LHR-SFO",
+    "origin": "LHR",
+    "destination": "SFO",
+    "avg_duration": 660
+  }
+]
+```
+
+## Error codes
+
+| Code | Description |
+|------|-------------|
+| `401 Unauthorized` | Missing or invalid authentication credentials |
+| `500 Internal Server Error` | Service is temporarily unavailable |

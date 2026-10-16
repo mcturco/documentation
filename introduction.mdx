@@ -1,0 +1,53 @@
+---
+title: "Kong Air REST API Platform: Build Airline Integrations"
+sidebarTitle: "Introduction"
+description: "Kong Air's REST APIs give developers access to flight schedules, route data, bookings, and customer profiles through a single authenticated base URL."
+---
+
+Kong Air provides a set of REST APIs that power flight search, booking management, and customer data access for airline applications. This portal is your starting point — you'll find authentication guides, endpoint references, and step-by-step integration walkthroughs for the full Kong Air API surface.
+
+## What you can build
+
+The Kong Air APIs are organized into four services:
+
+<CardGroup cols={2}>
+  <Card title="Flights" icon="plane" href="/api/flights/get-flights">
+    Query scheduled flights for any given day and retrieve per-flight details including meal options and aircraft type
+  </Card>
+  <Card title="Routes" icon="route" href="/api/routes/get-routes">
+    List all origin/destination airport pairs that Kong Air operates, filterable by origin
+  </Card>
+  <Card title="Bookings" icon="ticket" href="/api/bookings/get-bookings">
+    Retrieve a customer's existing reservations or create a new booking for a given flight and seat
+  </Card>
+  <Card title="Customer" icon="user" href="/api/customer/get-customer">
+    Fetch a customer's profile including contact information, frequent flyer number, and saved payment methods
+  </Card>
+</CardGroup>
+
+## Base URL
+
+All Kong Air API endpoints share a single base URL:
+
+```
+https://api.kong-air.com
+```
+
+## Authentication
+
+Every request must be authenticated. Kong Air supports two methods:
+
+| Method | Header | Example |
+|--------|--------|---------|
+| API Key | `X-API-Key` | `X-API-Key: your-api-key` |
+| Bearer JWT | `Authorization` | `Authorization: Bearer your-jwt-token` |
+
+See the [Authentication](/authentication) page for details on obtaining and using credentials.
+
+## Versioning and stability
+
+The Kong Air APIs are versioned. The current stable version is `v0.1.0`. Breaking changes will be communicated in advance with a deprecation notice period.
+
+<Tip>
+  Ready to make your first call? Jump to the [Quickstart](/quickstart) guide.
+</Tip>

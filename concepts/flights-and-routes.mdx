@@ -1,0 +1,84 @@
+---
+title: "Flights and Routes: Schedules and Airport Pairings"
+sidebarTitle: "Flights & Routes"
+description: "Learn how Kong Air's Flights and Routes services model scheduled departures, airport pairings, and flight detail data available through the API."
+---
+
+The Flights and Routes services form the foundation of Kong Air's API platform. Routes define the airport pairs Kong Air flies between; Flights are the scheduled departures that operate on those routes.
+
+## Routes
+
+A **Route** represents an origin/destination airport pairing that Kong Air is registered to fly. Routes are stable — they change infrequently and act as the backbone for flight scheduling.
+
+### Route object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique route identifier in `ORIGIN-DEST` format, e.g. `LHR-SFO` |
+| `origin` | string | 3-letter IATA airport code for the departure airport |
+| `destination` | string | 3-letter IATA airport code for the arrival airport |
+| `avg_duration` | integer | Average flight duration in minutes |
+
+```json
+{
+  "id": "LHR-SFO",
+  "origin": "LHR",
+  "destination": "SFO",
+  "avg_duration": 660
+}
+```
+
+## Flights
+
+A **Flight** is a scheduled departure on a specific route. Each flight has a unique flight number that you use to look up details or create a booking.
+
+### Flight object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `number` | string | Unique flight number, e.g. `KD924` |
+| `route_id` | string | The route this flight operates on, e.g. `LHR-SFO` |
+| `scheduled_departure` | ISO 8601 datetime | Scheduled takeoff time in UTC |
+| `scheduled_arrival` | ISO 8601 datetime | Scheduled landing time in UTC |
+
+```json
+{
+  "number": "KD924",
+  "route_id": "LHR-SFO",
+  "scheduled_departure": "2024-03-20T09:12:28Z",
+  "scheduled_arrival": "2024-03-20T19:12:28Z"
+}
+```
+
+## Flight details
+
+For richer information about a specific flight, use the `/flights/{flightNumber}/details` endpoint. This returns additional metadata useful for passenger-facing applications.
+
+### FlightDetails object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `flight_number` | string | The flight number |
+| `in_flight_entertainment` | boolean | Whether IFE is available |
+| `meal_options` | array of strings | Available meal choices for this flight |
+| `aircraft_type` | string | Aircraft model, e.g. `Boeing 787` |
+
+```json
+{
+  "flight_number": "KD924",
+  "in_flight_entertainment": true,
+  "meal_options": ["Standard", "Vegetarian", "Vegan"],
+  "aircraft_type": "Boeing 787"
+}
+```
+
+## Typical lookup flow
+
+A common pattern when building a flight search feature:
+
+1. Call `GET /routes` to show available destinations
+2. Call `GET /flights?date=2024-03-20` to list flights on a chosen date
+3. Match flights to routes using the `route_id` field
+4. Call `GET /flights/{number}/details` to show enriched per-flight info to the user
+
+See the [Search Flights guide](/guides/search-flights) for a complete walkthrough.

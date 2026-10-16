@@ -1,0 +1,106 @@
+---
+title: "Kong Air API Error Codes and Troubleshooting Guide"
+sidebarTitle: "Error Codes"
+description: "Reference for Kong Air API HTTP error codes, error response shapes, and how to diagnose and resolve the most common integration issues."
+---
+
+Kong Air APIs return standard HTTP status codes to indicate whether a request succeeded or failed. This page describes each error code, what causes it, and how to fix it.
+
+## Error response format
+
+Most error responses return a JSON body with a `message` field describing the problem:
+
+```json
+{
+  "message": "Flight not found"
+}
+```
+
+Some endpoints return a plain text string for simple errors (e.g., `"Not found"` for booking creation failures).
+
+## HTTP status code reference
+
+### 2xx — Success
+
+| Code | Meaning | Notes |
+|------|---------|-------|
+| `200 OK` | Request succeeded | Standard successful response for GET requests |
+| `201 Created` | Resource created | Returned by `POST /bookings` on successful booking creation |
+
+### 4xx — Client errors
+
+| Code | Meaning | Common cause |
+|------|---------|----------|
+| `400 Bad Request` | Malformed request | Invalid JSON body or missing required fields |
+| `401 Unauthorized` | Authentication failed | Missing or invalid `X-API-Key` or `Authorization` header |
+| `403 Forbidden` | Access denied | Valid credentials but insufficient permissions for this resource |
+| `404 Not Found` | Resource not found | Flight number doesn't exist, or route ID is invalid |
+
+### 5xx — Server errors
+
+| Code | Meaning | What to do |
+|------|---------|------------|
+| `500 Internal Server Error` | Service is unhealthy | Retry after a short delay; contact support if the issue persists |
+
+## Common errors and fixes
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized on every request">
+    Your API key or JWT token is missing, expired, or malformed.
+
+    **Check:**
+    - Is the `X-API-Key` header included in every request?
+    - Is the header name spelled correctly (case-sensitive: `X-API-Key`)?
+    - Is the API key active and not revoked?
+    - If using Bearer auth: is your JWT token expired?
+
+    ```bash
+    # Correct
+    curl -H "X-API-Key: your-key" https://api.kong-air.com/flights
+
+    # Incorrect — missing header
+    curl https://api.kong-air.com/flights
+    ```
+  </Accordion>
+
+  <Accordion title="404 Not Found when creating a booking">
+    The `flight_number` in your booking request doesn't match any known flight.
+
+    **Check:**
+    - Is the flight number correct? Verify it using `GET /flights` or `GET /flights/{flightNumber}`.
+    - Flight numbers are case-sensitive (e.g., `KD924`, not `kd924`).
+    - The flight may no longer be scheduled — check for a valid departure date.
+  </Accordion>
+
+  <Accordion title="404 Not Found for GET /customer">
+    The authenticated customer identity doesn't have an associated customer record.
+
+    **Check:**
+    - Is your API key associated with a valid customer account?
+    - Contact Kong Air support to verify your customer account is active.
+  </Accordion>
+
+  <Accordion title="500 Internal Server Error">
+    The service encountered an unexpected problem.
+
+    **Steps:**
+    1. Wait 10–30 seconds and retry the request.
+    2. If the issue persists, contact Kong Air support with your request timestamp and the endpoint you were calling.
+  </Accordion>
+
+  <Accordion title="Empty response from GET /flights">
+    The flights endpoint returned an empty array `[]`.
+
+    **Check:**
+    - Are you passing a specific `date` that has no scheduled flights? Try omitting the parameter to get today's flights.
+    - Ensure the date format is `YYYY-MM-DD` (e.g., `2024-03-20`), not a different format.
+  </Accordion>
+</AccordionGroup>
+
+## Getting help
+
+If you're experiencing an issue not covered here, contact Kong Air support with:
+
+- The full request URL and headers (redact your API key)
+- The HTTP status code and response body you received
+- The timestamp of the failing request

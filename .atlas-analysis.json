@@ -1,0 +1,101 @@
+{
+  "projectType": "api-service",
+  "projectName": "Kong Air Developer Portal",
+  "projectDescription": "A developer portal for the Kong Air API platform, providing access to flight, route, booking, and customer APIs for building airline applications.",
+  "theme": "luma",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/overview",
+              "concepts/flights-and-routes",
+              "concepts/bookings",
+              "concepts/customers"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/search-flights",
+              "guides/create-booking",
+              "guides/manage-customer"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "errors",
+              "faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Flights",
+            "pages": [
+              "api/flights/get-flights",
+              "api/flights/get-flight-by-number",
+              "api/flights/get-flight-details"
+            ]
+          },
+          {
+            "group": "Routes",
+            "pages": [
+              "api/routes/get-routes",
+              "api/routes/get-route"
+            ]
+          },
+          {
+            "group": "Bookings",
+            "pages": [
+              "api/bookings/get-bookings",
+              "api/bookings/create-booking"
+            ]
+          },
+          {
+            "group": "Customer",
+            "pages": [
+              "api/customer/get-customer"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Flights API — query scheduled flights by date and flight number",
+    "Routes API — discover all origin/destination airport routes",
+    "Bookings API — create and retrieve customer flight bookings",
+    "Customer API — access customer profile, payment methods, and frequent flyer info",
+    "API Key and Bearer JWT authentication",
+    "Single base URL at https://api.kong-air.com"
+  ],
+  "publicApiSurface": [
+    "GET /flights",
+    "GET /flights/{flightNumber}",
+    "GET /flights/{flightNumber}/details",
+    "GET /routes",
+    "GET /routes/{id}",
+    "GET /bookings",
+    "POST /bookings",
+    "GET /customer"
+  ]
+}

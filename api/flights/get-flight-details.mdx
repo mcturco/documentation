@@ -1,0 +1,78 @@
+---
+title: "GET /flights/{flightNumber}/details — Flight Details"
+sidebarTitle: "GET /flights/{flightNumber}/details"
+description: "GET /flights/{flightNumber}/details — Returns enriched details for a flight including aircraft type, in-flight entertainment, and meal options."
+---
+
+Returns enriched details for a specific flight, including the aircraft type, whether in-flight entertainment is available, and the available meal options. Use this endpoint to display richer content to passengers when they select a flight.
+
+**Endpoint**
+
+```
+GET https://api.kong-air.com/flights/{flightNumber}/details
+```
+
+## Request
+
+### Headers
+
+<ParamField header="X-API-Key" type="string">
+  Your Kong Air API key. Required if not using Bearer authentication.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Bearer JWT token. Required if not using API key authentication. Format: `Bearer <token>`
+</ParamField>
+
+### Path parameters
+
+<ParamField path="flightNumber" type="string" required>
+  The flight number to fetch details for. Example: `KD924`
+</ParamField>
+
+## Response
+
+Returns a FlightDetails object.
+
+<ResponseField name="flight_number" type="string" required>
+  The flight number this detail record belongs to
+</ResponseField>
+
+<ResponseField name="in_flight_entertainment" type="boolean" required>
+  Whether in-flight entertainment (IFE) is available on this flight
+</ResponseField>
+
+<ResponseField name="meal_options" type="array of strings" required>
+  List of available meal choices, e.g. `["Standard", "Vegetarian", "Vegan"]`
+</ResponseField>
+
+<ResponseField name="aircraft_type" type="string" required>
+  The aircraft model operating this flight, e.g. `"Boeing 787"`
+</ResponseField>
+
+## Examples
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/flights/KD924/details
+```
+
+**200 OK Response**
+
+```json
+{
+  "flight_number": "KD924",
+  "in_flight_entertainment": true,
+  "meal_options": ["Standard", "Vegetarian", "Vegan"],
+  "aircraft_type": "Boeing 787"
+}
+```
+
+## Error codes
+
+| Code | Description |
+|------|-------------|
+| `401 Unauthorized` | Missing or invalid authentication credentials |
+| `404 Not Found` | No flight exists with the given flight number |
+| `500 Internal Server Error` | Service is temporarily unavailable |

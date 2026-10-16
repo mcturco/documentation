@@ -1,0 +1,107 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "luma",
+  "name": "Kong Air Developer Portal",
+  "colors": {
+    "primary": "#ef7025",
+    "light": "#eec9bc",
+    "dark": "#4fa1ab"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "primary": {
+      "type": "button",
+      "label": "Get API Access",
+      "href": "https://api.kong-air.com"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/overview",
+              "concepts/flights-and-routes",
+              "concepts/bookings",
+              "concepts/customers"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/search-flights",
+              "guides/create-booking",
+              "guides/manage-customer"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "errors",
+              "faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Flights",
+            "pages": [
+              "api/flights/get-flights",
+              "api/flights/get-flight-by-number",
+              "api/flights/get-flight-details"
+            ]
+          },
+          {
+            "group": "Routes",
+            "pages": [
+              "api/routes/get-routes",
+              "api/routes/get-route"
+            ]
+          },
+          {
+            "group": "Bookings",
+            "pages": [
+              "api/bookings/get-bookings",
+              "api/bookings/create-booking"
+            ]
+          },
+          {
+            "group": "Customer",
+            "pages": [
+              "api/customer/get-customer"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/Kong/KongAir"
+    }
+  },
+  "variables": {
+    "company_name": "Kong"
+  },
+  "api": {
+    "openapi": "SFGBreweryAPI.json"
+  }
+}

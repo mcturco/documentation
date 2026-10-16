@@ -1,0 +1,123 @@
+---
+title: "Create and Retrieve Flight Bookings with Kong Air"
+sidebarTitle: "Create Booking"
+description: "Walk through the full Kong Air booking flow: searching for a flight, submitting a booking request, and retrieving confirmed reservations for a customer."
+---
+
+This guide covers the full booking creation flow using the Kong Air Bookings API. You'll search for an available flight, create a reservation, and retrieve the confirmed booking.
+
+## Prerequisites
+
+- A valid Kong Air API key with access to the Bookings service
+- A known flight number (use the [Flights API](/api/flights/get-flights) to find one)
+
+## Step 1 — Find an available flight
+
+Before creating a booking, look up a valid flight number. Search flights for your target date:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  "https://api.kong-air.com/flights?date=2024-03-20" \
+  | jq '.[0].number'
+```
+
+Note the `number` field — you'll use it as the `flight_number` in your booking request.
+
+## Step 2 — Create the booking
+
+Send a `POST` request to `/bookings` with the flight number and seat assignment. Both fields are included in the request body:
+
+```bash
+curl -s -X POST \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"flight_number": "KD924", "seat": "19B"}' \
+  https://api.kong-air.com/bookings
+```
+
+A successful response returns `201 Created` with your ticket number:
+
+```json
+{
+  "ticket_number": "CDF3412"
+}
+```
+
+Save the `ticket_number` — this is the customer's booking reference.
+
+## Step 3 — Retrieve the booking
+
+Call `GET /bookings` to retrieve all current bookings for the authenticated customer:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/bookings
+```
+
+```json
+[
+  {
+    "ticket_number": "CDF3412",
+    "seat": "19B",
+    "flight": {
+      "number": "KD924",
+      "route_id": "LHR-SFO",
+      "scheduled_departure": "2024-03-20T09:12:28Z",
+      "scheduled_arrival": "2024-03-20T19:12:28Z"
+    }
+  }
+]
+```
+
+## Error handling
+
+<Tabs>
+  <Tab title="Flight not found (404)">
+    If you pass a `flight_number` that doesn't exist, the Bookings API returns `404 Not Found`:
+
+    ```json
+    "Not found"
+    ```
+
+    Verify the flight number using `GET /flights` or `GET /flights/{flightNumber}` before submitting a booking.
+  </Tab>
+  <Tab title="Unauthorized (401)">
+    If your credentials are missing or invalid, you'll receive `401 Unauthorized`. Make sure your `X-API-Key` header is present and the key is active.
+  </Tab>
+</Tabs>
+
+## Complete booking flow
+
+```bash booking-flow.sh
+#!/bin/bash
+API_KEY="$KONG_AIR_API_KEY"
+BASE="https://api.kong-air.com"
+
+# 1. Find a flight
+FLIGHT=$(curl -s -H "X-API-Key: $API_KEY" "$BASE/flights" | jq -r '.[0].number')
+echo "Booking flight: $FLIGHT"
+
+# 2. Create the booking
+RESPONSE=$(curl -s -X POST \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"flight_number\": \"$FLIGHT\", \"seat\": \"12A\"}" \
+  "$BASE/bookings")
+
+TICKET=$(echo "$RESPONSE" | jq -r '.ticket_number')
+echo "Booking confirmed. Ticket number: $TICKET"
+
+# 3. Retrieve all bookings
+curl -s -H "X-API-Key: $API_KEY" "$BASE/bookings"
+```
+
+<Note>
+  The `seat` field in the request body is optional. If you omit it, the service assigns a seat automatically.
+</Note>
+
+## Next steps
+
+- [POST /bookings reference](/api/bookings/create-booking) — full request and response schema
+- [Manage Customer](/guides/manage-customer) — retrieve customer profile data alongside bookings

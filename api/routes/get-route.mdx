@@ -1,0 +1,78 @@
+---
+title: "GET /routes/{id} — Fetch a Specific Kong Air Route"
+sidebarTitle: "GET /routes/{id}"
+description: "GET /routes/{id} — Returns a single Kong Air route by its ID, such as LHR-SFO, including origin, destination, and average flight duration. Returns 404 if not found."
+---
+
+Returns a single Kong Air route given its route ID. Use this endpoint to retrieve details about a specific origin/destination pairing, such as the average flight duration.
+
+**Endpoint**
+
+```
+GET https://api.kong-air.com/routes/{id}
+```
+
+## Request
+
+### Headers
+
+<ParamField header="X-API-Key" type="string">
+  Your Kong Air API key. Required if not using Bearer authentication.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Bearer JWT token. Required if not using API key authentication. Format: `Bearer <token>`
+</ParamField>
+
+### Path parameters
+
+<ParamField path="id" type="string" required>
+  The route identifier in `ORIGIN-DEST` format. Example: `LHR-SFO`
+</ParamField>
+
+## Response
+
+Returns a single Route object.
+
+<ResponseField name="id" type="string" required>
+  Route identifier in `ORIGIN-DEST` format
+</ResponseField>
+
+<ResponseField name="origin" type="string" required>
+  3-letter IATA code for the departure airport
+</ResponseField>
+
+<ResponseField name="destination" type="string" required>
+  3-letter IATA code for the arrival airport
+</ResponseField>
+
+<ResponseField name="avg_duration" type="integer" required>
+  Average flight duration for this route in minutes
+</ResponseField>
+
+## Examples
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/routes/LHR-SFO
+```
+
+**200 OK Response**
+
+```json
+{
+  "id": "LHR-SFO",
+  "origin": "LHR",
+  "destination": "SFO",
+  "avg_duration": 660
+}
+```
+
+## Error codes
+
+| Code | Description |
+|------|-------------|
+| `401 Unauthorized` | Missing or invalid authentication credentials |
+| `404 Not Found` | No route exists with the given route ID |
+| `500 Internal Server Error` | Service is temporarily unavailable |

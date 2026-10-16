@@ -1,0 +1,103 @@
+---
+title: "Kong Air API Quickstart: First Authenticated API Call"
+sidebarTitle: "Quickstart"
+description: "Make your first authenticated Kong Air API call — search for scheduled flights — in five minutes or less with just curl or any HTTP client."
+---
+
+This guide walks you through making your first Kong Air API call from scratch. By the end, you'll have retrieved a list of scheduled flights and be ready to explore the rest of the platform.
+
+## Prerequisites
+
+Before you start, you need:
+
+- An API key or JWT token (contact the Kong Air platform team to request access)
+- `curl` or an HTTP client such as Postman or Insomnia
+
+## Make your first request
+
+<Steps>
+  <Step title="Set your credentials">
+    Export your API key as an environment variable so you don't have to paste it into every command:
+
+    ```bash
+    export KONG_AIR_API_KEY="your-api-key-here"
+    ```
+  </Step>
+
+  <Step title="Fetch today's scheduled flights">
+    Call the Flights endpoint to retrieve all flights scheduled for today:
+
+    ```bash
+    curl -s \
+      -H "X-API-Key: $KONG_AIR_API_KEY" \
+      https://api.kong-air.com/flights
+    ```
+
+    You'll receive a JSON array of scheduled flights:
+
+    ```json
+    [
+      {
+        "number": "KD924",
+        "route_id": "LHR-SFO",
+        "scheduled_departure": "2024-03-20T09:12:28Z",
+        "scheduled_arrival": "2024-03-20T19:12:28Z"
+      },
+      {
+        "number": "KD925",
+        "route_id": "SFO-LHR",
+        "scheduled_departure": "2024-03-21T09:12:28Z",
+        "scheduled_arrival": "2024-03-21T19:12:28Z"
+      }
+    ]
+    ```
+  </Step>
+
+  <Step title="Filter by date">
+    Pass an optional `date` query parameter to narrow results to a specific day:
+
+    ```bash
+    curl -s \
+      -H "X-API-Key: $KONG_AIR_API_KEY" \
+      "https://api.kong-air.com/flights?date=2024-03-20"
+    ```
+  </Step>
+
+  <Step title="Look up flight details">
+    Use a flight number from the list to fetch enriched details including aircraft type and in-flight entertainment:
+
+    ```bash
+    curl -s \
+      -H "X-API-Key: $KONG_AIR_API_KEY" \
+      https://api.kong-air.com/flights/KD924/details
+    ```
+
+    ```json
+    {
+      "flight_number": "KD924",
+      "in_flight_entertainment": true,
+      "meal_options": ["Standard", "Vegetarian", "Vegan"],
+      "aircraft_type": "Boeing 787"
+    }
+    ```
+  </Step>
+</Steps>
+
+## Next steps
+
+Now that you've made your first call, explore more of the platform:
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn about API keys, JWT tokens, and how to handle auth errors
+  </Card>
+  <Card title="Search Flights Guide" icon="magnifying-glass" href="/guides/search-flights">
+    Build a complete flight search flow with routes and date filtering
+  </Card>
+  <Card title="Create a Booking" icon="ticket" href="/guides/create-booking">
+    Walk through the full booking creation workflow end to end
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/flights/get-flights">
+    Explore every endpoint across all four Kong Air services
+  </Card>
+</CardGroup>

@@ -1,0 +1,102 @@
+---
+title: "Retrieve and Display Customer Profile Data"
+sidebarTitle: "Manage Customer"
+description: "Learn how to fetch a Kong Air customer profile including contact information, frequent flyer number, and saved payment methods using the Customer API."
+---
+
+The Kong Air Customer API gives you access to a traveler's profile information, including their contact details, frequent flyer number, and saved payment methods. This guide shows you how to retrieve and work with customer data in your integration.
+
+## Prerequisites
+
+- A valid Kong Air API key or Bearer JWT
+- The customer must have an active Kong Air account
+
+## Fetch the customer profile
+
+A single `GET /customer` request returns the full profile for the currently authenticated customer. The API resolves the customer identity from your credentials automatically:
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/customer
+```
+
+A successful response looks like this:
+
+```json
+{
+  "id": "cust_001",
+  "username": "alice",
+  "name": "Alice Johnson",
+  "information": {
+    "address": "123 Heathrow Road, London, UK",
+    "phone_number": "+44 20 7946 0958",
+    "email": "alice@example.com",
+    "frequent_flier_number": "KA-FF-445521",
+    "payment_methods": [
+      {
+        "id": "pm_001",
+        "redacted_card_number": "**** **** **** 4242",
+        "card_holder_name": "Alice Johnson",
+        "expiration-date": "12/26"
+      }
+    ]
+  }
+}
+```
+
+## Working with frequent flyer data
+
+The `frequent_flier_number` field in the `information` object contains the customer's Kong Air loyalty program identifier. Use this to display loyalty status or apply frequent flyer benefits in your application:
+
+```javascript customer.js
+const customer = await fetchCustomer(); // GET /customer
+
+if (customer.information.frequent_flier_number) {
+  console.log(`Frequent Flyer: ${customer.information.frequent_flier_number}`);
+  // Apply loyalty benefits, display tier status, etc.
+}
+```
+
+## Working with payment methods
+
+Payment methods are returned in redacted form — only the last four digits of the card number are visible. Display these to the customer for payment selection without ever exposing full card data:
+
+```javascript payments.js
+const { payment_methods } = customer.information;
+
+payment_methods.forEach(method => {
+  console.log(`${method.card_holder_name} — ${method.redacted_card_number} (exp: ${method['expiration-date']})`);
+});
+```
+
+## Error handling
+
+| Status | Meaning | Resolution |
+|--------|---------|------------|
+| `401 Unauthorized` | Invalid or missing credentials | Check your API key or JWT token |
+| `404 Not Found` | No customer record found for the authenticated identity | Verify the customer account exists and the correct credentials are being used |
+
+## Combining customer and booking data
+
+A common pattern is to fetch both customer profile and booking history together when displaying a passenger's account overview:
+
+```bash
+# Fetch customer profile
+CUSTOMER=$(curl -s -H "X-API-Key: $KONG_AIR_API_KEY" https://api.kong-air.com/customer)
+
+# Fetch their bookings
+BOOKINGS=$(curl -s -H "X-API-Key: $KONG_AIR_API_KEY" https://api.kong-air.com/bookings)
+
+echo "Customer: $(echo $CUSTOMER | jq -r '.name')"
+echo "Bookings: $(echo $BOOKINGS | jq length)"
+```
+
+<Note>
+  Customer profile data is read-only through the public API. To update profile details, direct customers to the Kong Air account settings page.
+</Note>
+
+## Next steps
+
+- [GET /customer reference](/api/customer/get-customer) — full response schema documentation
+- [GET /bookings reference](/api/bookings/get-bookings) — retrieve the customer's flight reservations

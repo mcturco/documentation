@@ -1,0 +1,46 @@
+---
+title: "Authenticate Kong Air API Requests with Keys or JWTs"
+sidebarTitle: "Authentication"
+description: "Kong Air supports API key and Bearer JWT authentication. Learn how to pass credentials in request headers and handle authentication errors."
+---
+
+Every request to the Kong Air API must include valid credentials. Kong Air supports two authentication methods: API keys and Bearer JWTs. Both are passed as HTTP request headers — choose whichever fits your integration.
+
+## API Key authentication
+
+An API key is the simplest way to authenticate. Pass it in the `X-API-Key` header on every request:
+
+```bash
+curl -s \
+  -H "X-API-Key: your-api-key" \
+  https://api.kong-air.com/flights
+```
+
+<Tip>
+  Store your API key in an environment variable and never hard-code it in your source code.
+</Tip>
+
+## Bearer JWT authentication
+
+If your integration uses JWT tokens, pass the token in the `Authorization` header using the `Bearer` scheme:
+
+```bash
+curl -s \
+  -H "Authorization: Bearer your-jwt-token" \
+  https://api.kong-air.com/flights
+```
+
+## Authentication errors
+
+| HTTP Status | Meaning | What to do |
+|-------------|---------|------------|
+| `401 Unauthorized` | Missing or invalid credentials | Check that you're sending the correct header and that your key or token is valid and not expired |
+| `403 Forbidden` | Valid credentials, but insufficient permissions | Contact the Kong Air platform team to verify your access level |
+
+## Getting credentials
+
+To obtain an API key or JWT credentials, contact the Kong Air platform team. Provide your application name, expected usage volume, and the endpoints you need access to.
+
+<Warning>
+  Keep your credentials secret. Do not commit API keys or tokens to source control, and rotate them immediately if you suspect they have been exposed.
+</Warning>

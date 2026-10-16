@@ -1,0 +1,111 @@
+---
+title: "GET /bookings — List All Bookings for a Customer"
+sidebarTitle: "GET /bookings"
+description: "GET /bookings — Returns all flight bookings for the authenticated customer. Each booking includes ticket number, seat, and full flight details."
+---
+
+Returns all current flight bookings for the authenticated customer. The response includes the ticket number, assigned seat, and embedded flight information for each reservation.
+
+**Endpoint**
+
+```text expandable
+GET https://api.kong-air.com/bookings
+```
+
+## Request
+
+### Headers
+
+This is a header for something.
+
+| Column 1 | Column 2 |  |  |
+| --- | --- | --- | --- |
+| Something | Something else |  |  |
+|  |  |  |  |
+
+<Prompt actions={["copy"]}>
+</Prompt>
+
+<CodeGroup>
+
+```text file name
+```
+
+```text file name
+```
+
+</CodeGroup>
+
+<ParamField header="X-API-Key" type="string">
+  Your Kong Air API key. Required if not using Bearer authentication.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Bearer JWT token. Required if not using API key authentication. Format: `Bearer <token>`
+</ParamField>
+
+## Response
+
+Returns a JSON array of Booking objects.
+
+<ResponseField name="ticket_number" type="string" required>
+  Unique ticket reference number for this booking, e.g. `CDF3412`
+</ResponseField>
+
+<ResponseField name="seat" type="string">
+  Assigned seat number, e.g. `32A`
+</ResponseField>
+
+<ResponseField name="flight" type="object" required>
+  Embedded flight details for this booking
+
+  <Expandable title="flight properties">
+    <ResponseField name="number" type="string">
+      Flight number
+    </ResponseField>
+
+    <ResponseField name="route_id" type="string">
+      Route identifier
+    </ResponseField>
+
+    <ResponseField name="scheduled_departure" type="string (ISO 8601 datetime)">
+      Scheduled departure time in UTC
+    </ResponseField>
+
+    <ResponseField name="scheduled_arrival" type="string (ISO 8601 datetime)">
+      Scheduled arrival time in UTC
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+```bash
+curl -s \
+  -H "X-API-Key: $KONG_AIR_API_KEY" \
+  https://api.kong-air.com/bookings
+```
+
+**200 OK Response**
+
+```json
+[
+  {
+    "ticket_number": "CDF3412",
+    "seat": "32A",
+    "flight": {
+      "number": "KA924",
+      "route_id": "LHR-SFO",
+      "scheduled_departure": "2023-09-03T09:15:00Z",
+      "scheduled_arrival": "2023-09-03T14:23:00Z"
+    }
+  }
+]
+```
+
+## Error codes
+
+| Code | Description |
+| --- | --- |
+| `401 Unauthorized` | Missing or invalid authentication credentials |
+| `500 Internal Server Error` | Service is temporarily unavailable |

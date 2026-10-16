@@ -1,0 +1,61 @@
+---
+title: "Kong Air API: Core Concepts and Architecture Guide"
+sidebarTitle: "Overview"
+description: "Understand how the Kong Air APIs are organized, how flights, routes, bookings, and customers connect, and how authentication works across every request."
+---
+
+The Kong Air platform exposes four REST API services that work together to power airline applications. Before building, it helps to understand how these services relate to each other and how data flows through a typical integration.
+
+## Service map
+
+Kong Air's APIs are organized into four services, all accessible under the same base URL (`https://api.kong-air.com`):
+
+| Service | Base Path | Description |
+|---------|-----------|-------------|
+| Flights | `/flights` | Scheduled flight listings and per-flight details |
+| Routes | `/routes` | Origin/destination airport route registry |
+| Bookings | `/bookings` | Customer flight reservations |
+| Customer | `/customer` | Customer profile and payment information |
+
+## How the services connect
+
+The services are linked by shared identifiers:
+
+- A **Route** (e.g., `LHR-SFO`) defines an origin/destination pairing.
+- A **Flight** references a Route via its `route_id` field, adding scheduled times and a unique flight number (e.g., `KD924`).
+- A **Booking** references a Flight via `flight_number`, linking a customer to a specific departure.
+- A **Customer** is identified by their `username`, which is resolved automatically from your authenticated session.
+
+```
+Route  ──(route_id)──▶  Flight  ──(flight_number)──▶  Booking
+                                                          │
+                                                   (authenticated identity)
+                                                          │
+                                                       Customer
+```
+
+## Request lifecycle
+
+Every Kong Air API request follows the same path:
+
+<Steps>
+  <Step title="Authenticate">
+    Include your `X-API-Key` or `Authorization: Bearer` header. The API gateway validates credentials before the request reaches any service.
+  </Step>
+  <Step title="Route to the correct service">
+    The gateway routes your request to the appropriate backend service based on the URL path.
+  </Step>
+  <Step title="Receive a JSON response">
+    All responses are JSON. Successful responses return `2xx` status codes; errors return `4xx` or `5xx` with a JSON body describing the problem.
+  </Step>
+</Steps>
+
+## Common data types
+
+| Type | Format | Example |
+|------|--------|---------|
+| Flight number | String | `KD924` |
+| Route ID | `{ORIGIN}-{DEST}` | `LHR-SFO` |
+| Airport code | 3-letter IATA | `LHR`, `SFO`, `SIN` |
+| Timestamps | ISO 8601 UTC | `2024-03-20T09:12:28Z` |
+| Ticket number | Alphanumeric string | `CDF3412` |
